@@ -1,12 +1,12 @@
 import sys
 import json
 import os
-sys.path.append('/home/nano/ATE_comm/')
+sys.path.append('/home/nano/misfit/ShineProduction/newATE/')
 import glob
 import shutil
 import time
-from configuration import nanoConfig
-from configuration.nanoConfig import *
+from configuration import ateConfig
+from configuration.ateConfig import *
 import subprocess
 import threading
 import netifaces as ni
@@ -56,9 +56,9 @@ class Controller():
 
     def GPIOStateThread(self):
         while True:
-            nanoConfig.log.logger.debug('Waiting for GPIO state changes')
+            ateConfig.log.logger.debug('Waiting for GPIO state changes')
             GPIO.wait_for_edge(self._controlPin, GPIO.FALLING)
-            nanoConfig.log.logger.debug('Rebooting..')
+            ateConfig.log.logger.debug('Rebooting..')
             try:
                 child = pexpect.spawn("sudo reboot now", timeout=14400)
                 # child = pexpect.spawn("bash /home/nano/Desktop/interface_script.sh", timeout=14400)
@@ -70,15 +70,15 @@ class Controller():
                 if child:
                     child.close()
                     if child.isalive():
-                        nanoConfig.log.logger.debug('Child did not exit gracefully.')
+                        ateConfig.log.logger.debug('Child did not exit gracefully.')
                     else:
-                        nanoConfig.log.logger.debug('Child exited gracefully.')
+                        ateConfig.log.logger.debug('Child exited gracefully.')
 
             # if child:
             #     if child.status > 0:
             #         raise Exception('')
             #     else:
-            #         nanoConfig.log.logger.info('Putting file completed')
+            #         ateConfig.log.logger.info('Putting file completed')
 
     def connectionStatusThread(self):
         connection_HB = threading.Event()
@@ -86,27 +86,27 @@ class Controller():
             status = self.ping(REMOTE_IP)
             if status:
                 if self.serial:
-                    nanoConfig.log.logger.debug("HB: USB network connection is Good | %s | %s | %s | %s | %s |"
+                    ateConfig.log.logger.debug("HB: USB network connection is Good | %s | %s | %s | %s | %s |"
                                                 %( self._testRunning, self.serial.handDragTestNanoStatus,
                                                    self.serial.circlesConcentricityTestATE3NanoStatus,
                                                    self.serial.eInkDeadPixelTestATE3NanoStatus,
                                                    self.serial.LEDUniformingTestATE3NanoStatus) )
                 else:
-                    nanoConfig.log.logger.debug("HB: USB network connection is Good")
+                    ateConfig.log.logger.debug("HB: USB network connection is Good")
                 self.createConnection()
                 self._serialNetworkStatusGood = True
             else:
-                nanoConfig.log.logger.debug("USB network connection is Bad")
+                ateConfig.log.logger.debug("USB network connection is Bad")
                 self._serialNetworkStatusGood = False
 
                 import netifaces as ni
                 ni.ifaddresses('usb0')
                 ip = ni.ifaddresses('usb0')[ni.AF_INET][0]['addr']
                 if ip == '10.0.1.2':
-                    nanoConfig.log.logger.debug("Pi'IP is not set yet")
+                    ateConfig.log.logger.debug("Pi'IP is not set yet")
 
                 else:
-                    nanoConfig.log.logger.debug("Running the initialization script")
+                    ateConfig.log.logger.debug("Running the initialization script")
                     self.interfaceInitialize()
 
     def controllerThread(self):
@@ -164,7 +164,7 @@ class Controller():
             # self.createConnection()
 
         except Exception as e:
-            nanoConfig.log.logger.error("Error: %s" %e)
+            ateConfig.log.logger.error("Error: %s" %e)
             pass
 
         # except IOError as e:
@@ -186,15 +186,15 @@ class Controller():
             if child:
                 child.close()
                 if child.isalive():
-                    nanoConfig.log.logger.debug('Child did not exit gracefully.')
+                    ateConfig.log.logger.debug('Child did not exit gracefully.')
                 else:
-                    nanoConfig.log.logger.debug('Child exited gracefully.')
+                    ateConfig.log.logger.debug('Child exited gracefully.')
         #
         # if child:
         #     if child.status > 0:
         #         raise Exception('')
         #     else:
-        #         nanoConfig.log.logger.info('Putting file completed')
+        #         ateConfig.log.logger.info('Putting file completed')
 
 
     def visionTests(self):
@@ -248,20 +248,20 @@ class Controller():
         return testResult
 
     def _handle_sftp_prompt(self, child):
-        # nanoConfig.log.logger.debug('Expecting prompt...')
+        # ateConfig.log.logger.debug('Expecting prompt...')
         i = child.expect(['.*password:.*', pexpect.EOF])
-        # nanoConfig.log.logger.debug(child.after)
+        # ateConfig.log.logger.debug(child.after)
         if i == 0:
-            nanoConfig.log.logger.debug('Supplying pass to sftp server')
+            ateConfig.log.logger.debug('Supplying pass to sftp server')
             child.sendline(self._password)
-            nanoConfig.log.logger.debug('sent pw')
+            ateConfig.log.logger.debug('sent pw')
             self._handle_sftp_prompt(child)
 
         if i == 1:
-            nanoConfig.log.logger.debug('EOF')
+            ateConfig.log.logger.debug('EOF')
 
         else:
-            nanoConfig.log.logger.debug('Invalid case')
+            ateConfig.log.logger.debug('Invalid case')
 
     def ping(self, ip):
         # ping_command = ['ping', ip, '-n', '1'] instead of ping_command = ['ping', ip, '-n 1'] for Windows

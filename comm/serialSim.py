@@ -6,7 +6,7 @@ import queue
 import serial
 import time
 
-from configuration import nanoConfig
+from configuration import ateConfig
 from .ateSerialUtil import *
 from utilities.myThread import MyThread
 
@@ -59,18 +59,18 @@ class TestSerialComm(object):
     def testAteReceive(self):
         # Read from the virtual srcTx serial device
         new_message = os.read(self.__srclb_master, 20)
-        nanoConfig.log.logger.info( 'ATE<-SimDUT - Receive Message - %r' % new_message)
+        ateConfig.log.logger.info( 'ATE<-SimDUT - Receive Message - %r' % new_message)
         return new_message
 
     # TEST - write the message to the simDUT receive loopback serial port
     def testAteSend(self, message):
         self.__destlb_ser.write(str.encode(message))
-        nanoConfig.log.logger.info( "   ATE->SimDUT Transmit - " + message)
+        ateConfig.log.logger.info( "   ATE->SimDUT Transmit - " + message)
 
     # TEST - loopback simDUT receive thread
     # this should be in a separate thread that is running all the time blocking on incoming messages.
     def test_dut_receive_thread(self):
-        nanoConfig.log.logger.info( "Starting testDutReceiveThread")
+        ateConfig.log.logger.info( "Starting testDutReceiveThread")
 
         # Pretty much an infinite loop waiting for incoming messages
         while self.__continue:
@@ -83,13 +83,13 @@ class TestSerialComm(object):
 
             # Read from the virtual serial device input
             new_message = os.read(self.__destlb_master, 20)
-            nanoConfig.log.logger.info( 'SimDUT<-ATE - Rx Thread: %r' % new_message)
+            ateConfig.log.logger.info( 'SimDUT<-ATE - Rx Thread: %r' % new_message)
 
             msg = list(new_message[:].split())
 
             # Must be a valid message ID in first byte
             if (msg[0] != b'33') and (msg[0] != b'40'):
-                nanoConfig.log.logger.info('ATE->SimDUT - Rx Thread, Bad Msg ID: %r' % msg)
+                ateConfig.log.logger.info('ATE->SimDUT - Rx Thread, Bad Msg ID: %r' % msg)
                 continue
 
             # ATE request message received, ignore any acks and nacks
@@ -104,7 +104,7 @@ class TestSerialComm(object):
 
                 # transmit the response to the ATE Rx thread
                 out = ' '.join(str(x) for x in resp)
-                nanoConfig.log.logger.info( 'SimDUT->ATE - Rx Thread, Queue Ack: %r' % out)
+                ateConfig.log.logger.info( 'SimDUT->ATE - Rx Thread, Queue Ack: %r' % out)
                 # self.srclb_ser.write(out)
                 #self.__test_txQ.put(out)
                 self.__test_txQ.put(resp[:])
@@ -119,16 +119,16 @@ class TestSerialComm(object):
 
                 # transmit the response to the srcRx thread (ATE)
                 out = ' '.join(str(x) for x in resp)
-                nanoConfig.log.logger.info( 'SimDUT->ATE - Rx Thread, Queue Status Response: %r' % out)
+                ateConfig.log.logger.info( 'SimDUT->ATE - Rx Thread, Queue Status Response: %r' % out)
                 # self.srclb_ser.write(out)
                 #self.__test_txQ.put(out)
                 self.__test_txQ.put(resp[:])
             else:
-                nanoConfig.log.logger.info( 'SimDUT<-ATE - Rx Thread, Ignore Ack or Nack, id = %r' % msg[0])
+                ateConfig.log.logger.info( 'SimDUT<-ATE - Rx Thread, Ignore Ack or Nack, id = %r' % msg[0])
 
     # TEST - Send out 1hz heartbeat message from DUT to ATE
     def test_heartbeat_transmit_thread(self):
-        nanoConfig.log.logger.info( "Starting testHeartbeatThread")
+        ateConfig.log.logger.info( "Starting testHeartbeatThread")
         hb_seq_num = 1
 
         # Pretty much an infinite loop waiting for incoming messages
@@ -147,14 +147,14 @@ class TestSerialComm(object):
             # transmit the response to the srcRx thread (ATE)
             out = ''
             out = ' '.join(str(x) for x in resp)
-            nanoConfig.log.logger.info( 'SimDUT->ATE - HB Thread, Queue Heartbeat: %r' % out)
+            ateConfig.log.logger.info( 'SimDUT->ATE - HB Thread, Queue Heartbeat: %r' % out)
             # self.srclb_ser.write(out)
             self.__test_txQ.put(out)
 
     # background thread to process any queued messages to transmit to ATE
     # ensures that messages are sent out in order one at a time
     def test_transmitQ_thread(self):
-        nanoConfig.log.logger.info( "Starting testTransmitQThread")
+        ateConfig.log.logger.info( "Starting testTransmitQThread")
 
         while self.__continue:
             time.sleep(0.1)
@@ -163,8 +163,8 @@ class TestSerialComm(object):
                 message = self.__test_txQ.get()
 
                 out = ' '.join(str(x) for x in message)
-                #nanoConfig.log.logger.info( '\nSimDUT->ATE - Transmit Q Thread: %r' % message)
-                nanoConfig.log.logger.info('\nSimDUT->ATE - Transmit Q Thread: %r' % out)
+                #ateConfig.log.logger.info( '\nSimDUT->ATE - Transmit Q Thread: %r' % message)
+                ateConfig.log.logger.info('\nSimDUT->ATE - Transmit Q Thread: %r' % out)
                 self.__srclb_ser.write(bytes(message))
 
     def killTestThreads(self):

@@ -1,17 +1,20 @@
 #!/usr/bin/env python
 """
 circlesConcentricityTest Class
-Created: 2019 Aug 29
+Created: 2017 Nov 07
+Author: Robert V
+Updated: 2019 Sep 18 by Lionel Tran
+
 Description:
 Implementation of the circles Concentricity Test class.
 This class is the method in which ATE measure distance
 between center of pinion and center of eink screen.
 """
 import time
-from configuration import nanoConfig
-from configuration.nanoConfig import *
+# from configuration import ateConfig
+from configuration.ateConfig import *
 from configuration.cvConfig import *
-# from configuration.bleConfig import *
+from configuration.bleConfig import *
 from tests.test import Test
 # from commands.bleCmd import BleCmd
 # import tests.scenario
@@ -114,9 +117,9 @@ class CirclesConcentricityTestATE3Nano(Test):
         all of the information of the test.
         :return: The distance between pinion center and eInk center
         '''
-        nanoConfig.log.logger.info('=====================================================================')
-        nanoConfig.log.logger.info('   Test Started   - ' + self._name)
-        nanoConfig.log.logger.info('=====================================================================')
+        ateConfig.log.logger.info('=====================================================================')
+        ateConfig.log.logger.info('   Test Started   - ' + self._name)
+        ateConfig.log.logger.info('=====================================================================')
         cmdResponse = ""
         startTime = time.time()
         results = {}
@@ -164,12 +167,12 @@ class CirclesConcentricityTestATE3Nano(Test):
                     result['Dial'] = cmdResponse
                     if result['Dial'] == {}:
                         testRes.append(False)
-                        nanoConfig.log.logger.info('Cannot find dial')
+                        ateConfig.log.logger.info('Cannot find dial')
                         break
                     else:
                         result['xDial'] = int(result['Dial']['dial'][0][0] + CONCENTRICITY_CROP_X1)
                         result['yDial'] = int(result['Dial']['dial'][0][1] + CONCENTRICITY_CROP_Y1)
-                        nanoConfig.log.logger.info('Dial data: %s' % result['Dial'])
+                        ateConfig.log.logger.info('Dial data: %s' % result['Dial'])
                         circle_dial = ((result["xDial"], result['yDial']), result['Dial']['dial'][1])
                         results['rDial'] = result['Dial']['dial'][1]
                         #Get circle center after cropping image
@@ -180,14 +183,14 @@ class CirclesConcentricityTestATE3Nano(Test):
                     result['eInk'] = cmdResponse
                     if result['eInk'] == {}:
                         testRes.append(False)
-                        nanoConfig.log.logger.info('Cannot find eInk circle')
+                        ateConfig.log.logger.info('Cannot find eInk circle')
                         break
                     else:
                         result["xEInk"] = int(result['eInk']['circle'][0][0] + CONCENTRICITY_CIRLCE_CROP_X1)
                         result['yEInk'] = int(result['eInk']['circle'][0][1] + CONCENTRICITY_CIRLCE_CROP_Y1)
                         circle_eInk = ((result["xEInk"], result['yEInk']), result['eInk']['circle'][1])
                         results['rEInk'] = result['eInk']['circle'][1]
-                        nanoConfig.log.logger.info('EInk data: %s' % result['eInk'])
+                        ateConfig.log.logger.info('EInk data: %s' % result['eInk'])
                 # elif cmd.type == 'cv' and cmd.operation == 'findPlatform':
                 #     res = cmdResponse
                 #     platform = res['platform']
@@ -198,7 +201,7 @@ class CirclesConcentricityTestATE3Nano(Test):
                     res['Rect'] = cmdResponse
                     if res['Rect'] == {}:
                         testRes.append(False)
-                        nanoConfig.log.logger.info('Cannot detect rectangle')
+                        ateConfig.log.logger.info('Cannot detect rectangle')
                         break
                     else:
                         points = res['Rect']['points']
@@ -217,7 +220,7 @@ class CirclesConcentricityTestATE3Nano(Test):
                         #Length of rectangle: 40 pixel in pixel
                         image_ratio = round(((dist[2]+dist[3])/2)/40, 4)
                         # print(dist)
-                        nanoConfig.log.logger.info("ratio: %s" %image_ratio)
+                        ateConfig.log.logger.info("ratio: %s" %image_ratio)
                         results['ratio'] = image_ratio
 
                 # BLE command timed out.
@@ -239,7 +242,7 @@ class CirclesConcentricityTestATE3Nano(Test):
                 '''
                 dist_mm = round(dist * 0.1165 / image_ratio, 4)
                 results['distance_mm'] = dist_mm
-                nanoConfig.log.logger.info('Distance between 2 centers: %s (mm)' % dist_mm)
+                ateConfig.log.logger.info('Distance between 2 centers: %s (mm)' % dist_mm)
                 if dist_mm >= MAX_DIST_TWO_CENTERS:
                     testRes.append(False)
                 else:
@@ -262,7 +265,6 @@ class CirclesConcentricityTestATE3Nano(Test):
                 image = cv2.resize(image, (0, 0), fx=0.5, fy=0.5)
                 cv2.imwrite(PROCESSED_IMAGES + "Concentricity_ATE3_" + internal_SN + "_" + str(filetimestamp) + ".jpeg", image)
 
-            nanoConfig.log.logger.debug("File Removed!")
 
             if False in testRes:
                 self._testResult['passed'] = False
@@ -270,8 +272,8 @@ class CirclesConcentricityTestATE3Nano(Test):
                 self._testResult['passed'] = True
 
             self._testResult['data'] = results
-            nanoConfig.log.logger.info('   Test Result: %s ' % self._testResult['data'])
-            nanoConfig.log.logger.info('   Test Completed - ' + self._name)
+            ateConfig.log.logger.info('   Test Result: %s ' % self._testResult['data'])
+            ateConfig.log.logger.info('   Test Completed - ' + self._name)
 
             self.calcTestDuration(startTime)
 

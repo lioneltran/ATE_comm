@@ -1,18 +1,14 @@
-﻿import queue
-import struct
-import time
-import os
+﻿import struct
 from utilities.singleton import Singleton
+
 from .serialComm import *
 from utilities.myThread import MyThread
 from comm.ateSerialUtil import *
 from comm.dataSubject import DataSubject
 from comm.responseSubject import ResponseSubject
-from configuration.nanoConfig import *
+
+from configuration.ateConfig import *
 from comm.sftpNano import SftpNano
-import shutil
-import zipfile
-from comm import ateSerialUtil
 '''
 Serial Application class provides an interface to the underlying serial port services.  Applications 
 should not use the serial port services directly in case there are future changes to this interface.
@@ -78,22 +74,20 @@ class SerialApp:
         serialComm Rx thread puts messages in this app queue
         :return: none
         '''
-        nanoConfig.log.logger.debug("Starting App processRxQueueThread")
+        ateConfig.log.logger.debug("Starting App processRxQueueThread")
 
         # Wait almost forever loop for messages on the application Rx queue.
         # Exits when the continue flag is False for orderly thread shutdown
-
         while self._continue:
             # Delay allows thread to periodically sleep and not "hog the system"
             time.sleep(USECS_100)
 
             # When message in queue, set the received flag for application to handle
-
             if not self.rxMessageAppQ.empty():
                 msg = self.rxMessageAppQ.get()
 
                 if msg[0] == DUT_HB_MSG_ID:
-                    nanoConfig.log.logger.debug('   SerialApp - DUT Heartbeat Status, Sequence Num: ' + msg[1])
+                    ateConfig.log.logger.debug('   SerialApp - DUT Heartbeat Status, Sequence Num: ' + msg[1])
 
                 elif msg[0] == ACK_MSG_ID:
                     # Get ack to indicate command/ack is successful
@@ -103,27 +97,27 @@ class SerialApp:
                 elif msg[0] == DUT_STATUS_MSG_ID or msg[0] == DUT_FILE_TRANSFER_STATUS_MSG_ID:
                     # logger.info( 'SerialApp - ATE Rx Queue Message: ' + message  + ", Hex: " + message.encode('hex'))
                     msgHex = '[' + ', '.join('0x{:02X}'.format(x) for x in msg) + ']'
-                    nanoConfig.log.logger.debug('   SerialApp - ATE RxQueue Message: %r' % msgHex)
+                    ateConfig.log.logger.debug('   SerialApp - ATE RxQueue Message: %r' % msgHex)
 
                     # serialComm puts a validated message on the rxMessageQ, now go handle it
                     self.lastResponseMessage = msg
                     self._dataSubject.notifyObservers()
 
                 elif msg[0] == ATE_REQ_MSG_ID:
-                    nanoConfig.log.logger.debug(
+                    ateConfig.log.logger.debug(
                         "Got request msg from Pi: compId: %s, cmdId: %s" % (msg[3], msg[4]))
 
                     self.processRequest(msg)
 
                 else:
-                   nanoConfig.log.logger.debug('   SerialApp - Invalid Message ID: ' + str(msg[0]))
+                   ateConfig.log.logger.debug('   SerialApp - Invalid Message ID: ' + str(msg[0]))
             '''
             else:
                 no_message_received_count += 1
 
                 # Check that the DUT is still alive - 10 second timeout
                 if no_message_received_count > 20:
-                    nanoConfig.log.logger.warning( "DUT Hearbeat not Received in 10 seconds")
+                    ateConfig.log.logger.warning( "DUT Hearbeat not Received in 10 seconds")
                     # Error
                     break
             '''
@@ -132,60 +126,60 @@ class SerialApp:
         cmdId = message[4]
 
         if str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_1']:
-            nanoConfig.log.logger.debug("Got msg to open Nano connection")
+            ateConfig.log.logger.debug("Got msg to open Nano connection")
             time.sleep(0.1)
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), [78, 65, 78, 79])
 
         elif str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_2']:
-            nanoConfig.log.logger.debug("Got Request msg for test Hand Drag Test Nano")
+            ateConfig.log.logger.debug("Got Request msg for test Hand Drag Test Nano")
             self._handDragTestNanoStatus = 1
             status = [self._handDragTestNanoStatus]
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), status)
 
         elif str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_3']:
-            nanoConfig.log.logger.debug("Got Request msg for test Circles Concentricity Test ATE3 Nano")
+            ateConfig.log.logger.debug("Got Request msg for test Circles Concentricity Test ATE3 Nano")
             self._circlesConcentricityTestATE3NanoStatus = 1
             status = [self._circlesConcentricityTestATE3NanoStatus]
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), status)
 
         elif str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_4']:
-            nanoConfig.log.logger.debug("Got Request msg for test EInk Dead Pixel Test ATE3 Nano")
+            ateConfig.log.logger.debug("Got Request msg for test EInk Dead Pixel Test ATE3 Nano")
             self._eInkDeadPixelTestATE3NanoStatus = 1
             status = [self._eInkDeadPixelTestATE3NanoStatus]
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), status)
 
         elif str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_5']:
-            nanoConfig.log.logger.debug("Got Request msg for test LED Uniforming Test ATE3 Nano")
+            ateConfig.log.logger.debug("Got Request msg for test LED Uniforming Test ATE3 Nano")
             self._LEDUniformingTestATE3NanoStatus = 1
             status = [self._LEDUniformingTestATE3NanoStatus]
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), status)
 
         elif str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_6']:
-            nanoConfig.log.logger.debug("Got Check status msg for test Hand Drag Test Nano")
+            ateConfig.log.logger.debug("Got Check status msg for test Hand Drag Test Nano")
             status = [self._handDragTestNanoStatus]
-            nanoConfig.log.logger.debug("Current status of test Hand Drag Test Nano: %s" %str(status))
+            ateConfig.log.logger.debug("Current status of test Hand Drag Test Nano: %s" %str(status))
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), status)
 
         elif str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_7']:
-            nanoConfig.log.logger.debug("Got Check status msg for test Circles Concentricity Test ATE3 Nano")
+            ateConfig.log.logger.debug("Got Check status msg for test Circles Concentricity Test ATE3 Nano")
             status = [self._circlesConcentricityTestATE3NanoStatus]
-            nanoConfig.log.logger.debug("Current status of test Circles Concentricity Test ATE3 Nano: %s" %str(status))
+            ateConfig.log.logger.debug("Current status of test Circles Concentricity Test ATE3 Nano: %s" %str(status))
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), status)
 
         elif str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_8']:
-            nanoConfig.log.logger.debug("Got Check status msg for test EInk Dead Pixel Test ATE3 Nano")
+            ateConfig.log.logger.debug("Got Check status msg for test EInk Dead Pixel Test ATE3 Nano")
             status = [self._eInkDeadPixelTestATE3NanoStatus]
-            nanoConfig.log.logger.debug("Current status of test EInk Dead Pixel Test ATE3 Nano: %s" %str(status))
+            ateConfig.log.logger.debug("Current status of test EInk Dead Pixel Test ATE3 Nano: %s" %str(status))
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), status)
 
         elif str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_9']:
-            nanoConfig.log.logger.debug("Got Check status msg for test LED Uniforming Test ATE3 Nano")
+            ateConfig.log.logger.debug("Got Check status msg for test LED Uniforming Test ATE3 Nano")
             status = [self._LEDUniformingTestATE3NanoStatus]
-            nanoConfig.log.logger.debug("Current status of test LED Uniforming Test ATE3 Nano: %s" %str(status))
+            ateConfig.log.logger.debug("Current status of test LED Uniforming Test ATE3 Nano: %s" %str(status))
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), status)
 
         elif str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_10']:
-            nanoConfig.log.logger.debug("Got Start Processing Images Request")
+            ateConfig.log.logger.debug("Got Start Processing Images Request")
             status = [1]
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), status)
 
@@ -198,7 +192,7 @@ class SerialApp:
             self._startProcessingImages = True
 
         if str(compId) == componentID['HT_NANO'] and str(cmdId) == commandID['HT_NANO_11']:
-            nanoConfig.log.logger.debug("Got msg to close Nano connection")
+            ateConfig.log.logger.debug("Got msg to close Nano connection")
             self._handDragTestNanoStatus = 0
             self._circlesConcentricityTestATE3NanoStatus = 0
             self._eInkDeadPixelTestATE3NanoStatus = 0
@@ -208,29 +202,29 @@ class SerialApp:
             self._restartController = True
 
         elif str(compId) == componentID['HT_FILE_TRANSFER'] and str(cmdId) == commandID['HT_FILE_TRANSFER_1']:
-            nanoConfig.log.logger.debug("Got File Transfer Status")
+            ateConfig.log.logger.debug("Got File Transfer Status")
             status = [1] # Continue File Transfer
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId), int(cmdId), status)
 
         elif str(compId) == componentID['HT_FILE_TRANSFER'] and str(cmdId) == commandID['HT_FILE_TRANSFER_2']:
-            nanoConfig.log.logger.debug("Got File Transfer Info")
+            ateConfig.log.logger.debug("Got File Transfer Info")
             status = [1] # Continue File Transfer
             payloadLen = message[1]
             filename = "".join(chr(x) for x in message[7:7 + payloadLen - 6])
-            nanoConfig.log.logger.debug("Got File Name: %s" %str(filename))
+            ateConfig.log.logger.debug("Got File Name: %s" %str(filename))
 
             self._fileReceived['filename'] = filename
             self._fileReceived['size_1'] = message[5]
             self._fileReceived['size_2'] = message[6]
-            nanoConfig.log.logger.debug("Information of received file: %s" % self._fileReceived)
+            ateConfig.log.logger.debug("Information of received file: %s" % self._fileReceived)
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId),
                              int(cmdId), status)
 
         elif str(compId) == componentID['HT_FILE_TRANSFER'] and str(cmdId) == commandID['HT_FILE_TRANSFER_3']:
-            nanoConfig.log.logger.debug("Got File Transfer Complete")
+            ateConfig.log.logger.debug("Got File Transfer Complete")
             status = [2]
             if os.path.isfile(DIANA_IMAGE + self._fileReceived['filename']):
-                nanoConfig.log.logger.debug("File %s exists" % (DIANA_IMAGE + self._fileReceived['filename']))
+                ateConfig.log.logger.debug("File %s exists" % (DIANA_IMAGE + self._fileReceived['filename']))
 
                 size = os.path.getsize(DIANA_IMAGE + self._fileReceived['filename'])
 
@@ -238,14 +232,14 @@ class SerialApp:
                 size_2 = (size >> 8) & 0xFF
 
                 if size_1 == self._fileReceived['size_1'] and size_2 == self._fileReceived['size_2']:# and crc32_1 == self._fileReceived['crc32_1'] and crc32_2 == self._fileReceived['crc32_2']:
-                    nanoConfig.log.logger.info("Perfect File Transfer")
+                    ateConfig.log.logger.info("Perfect File Transfer")
                     status = [3]  # Good checksum
 
                 else:
                     status = [4]  # Bad checksum
 
             else:
-                nanoConfig.log.logger.debug("File %s does not exist" % (DIANA_IMAGE +  self._fileReceived['filename']))
+                ateConfig.log.logger.debug("File %s does not exist" % (DIANA_IMAGE +  self._fileReceived['filename']))
                 status = [2] # Abort
 
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId),
@@ -253,10 +247,10 @@ class SerialApp:
 
         elif str(compId) == componentID['HT_FILE_TRANSFER'] and str(cmdId) == commandID['HT_FILE_TRANSFER_4']:
             status = []
-            nanoConfig.log.logger.debug("Got Get File Transfer Status")
+            ateConfig.log.logger.debug("Got Get File Transfer Status")
             payloadLen = message[1]
             filename = "".join(chr(x) for x in message[5:5 + payloadLen - 4])
-            nanoConfig.log.logger.debug("Got File Name: %s" %str(filename))
+            ateConfig.log.logger.debug("Got File Name: %s" %str(filename))
 
             self._fileToSend['filename'] = filename
 
@@ -267,7 +261,7 @@ class SerialApp:
                 else:
                     status = [2]  # Continue File Transfer
 
-            nanoConfig.log.logger.debug("Information of file to send: %s" % self._fileToSend)
+            ateConfig.log.logger.debug("Information of file to send: %s" % self._fileToSend)
             self.sendRequest(int(DUT_STATUS_MSG_ID), int(compId),
                              int(cmdId), status)
 
@@ -275,10 +269,10 @@ class SerialApp:
 
         elif str(compId) == componentID['HT_FILE_TRANSFER'] and str(cmdId) == commandID['HT_FILE_TRANSFER_5']:
             txMessage = []
-            nanoConfig.log.logger.debug("Got Get File Transfer Info")
+            ateConfig.log.logger.debug("Got Get File Transfer Info")
             payloadLen = 6
             fileSize = 0
-            nanoConfig.log.logger.debug("Information of file to send: %s" % self._fileToSend)
+            ateConfig.log.logger.debug("Information of file to send: %s" % self._fileToSend)
 
             if self._fileToSend['filename'] == 'processed_files.tar':
                 fileSize = self._fileToSend['filesize']
@@ -302,7 +296,7 @@ class SerialApp:
         :param message:
         :return: none
         '''
-        nanoConfig.log.logger.debug('   SerialApp - Processing DUT Response: ' + str(message[0]))
+        ateConfig.log.logger.debug('   SerialApp - Processing DUT Response: ' + str(message[0]))
 
     def killThreads(self):
         '''
@@ -353,7 +347,7 @@ class SerialApp:
                 convertedByteData = cmdData
 
             else:
-                nanoConfig.log.logger.error('   Invalid cmdData type ' + str(cmdData))
+                ateConfig.log.logger.error('   Invalid cmdData type ' + str(cmdData))
         except:
             return []
 
@@ -368,7 +362,7 @@ class SerialApp:
         :param cmdId: int, Command ID
         :return: boolean
         '''
-        nanoConfig.log.logger.debug("Send NANO ID: " + str(msgId))
+        ateConfig.log.logger.debug("Send NANO ID: " + str(msgId))
 
         self._txMessage = []
         crc = None
@@ -395,6 +389,7 @@ class SerialApp:
                     if cmdData is not None:
                         # can handle any type of cmdData and convert to list of bytes
                         cmdData = self.convertDataToByteList(cmdData)
+
                         payloadLen += len(cmdData)
 
                     self._txMessage.extend([msgId, payloadLen & 0xFF, (payloadLen >> 8) & 0xFF, compId, cmdId])
@@ -417,12 +412,10 @@ class SerialApp:
             self._txMessage.append(crc)
             self._txMessage.extend([SYNC1, SYNC2])
 
-            # nanoConfig.log.logger.info("_txMessage: %s" %self._txMessage)
-
             self.sendMessage(self._txMessage)
             return True
         else:
-            nanoConfig.log.logger.error("Invalid Tx message ID: " + msgId)
+            ateConfig.log.logger.error("Invalid Tx message ID: " + msgId)
             return False
 
 
@@ -432,7 +425,7 @@ class SerialApp:
         :param command:  All the attributes of the serial commmand
         :return:
         '''
-        nanoConfig.log.logger.info("Send ATE Message: " + command['name'])
+        ateConfig.log.logger.info("Send ATE Message: " + command['name'])
 
         self._txMessage = []
         crc = None
@@ -478,7 +471,7 @@ class SerialApp:
             crc = crc8Calc(self._txMessage[:6])
 
         else:
-            nanoConfig.log.logger.error("Invalid Tx message: " + command['name'])
+            ateConfig.log.logger.error("Invalid Tx message: " + command['name'])
             return False
 
         self._txMessage.append(crc)
@@ -494,7 +487,7 @@ class SerialApp:
         :return: none
         '''
         heartbeatStatus = message[1]
-        nanoConfig.log.logger.debug("DUT Heartbeat Status: " + heartbeatStatus + ", Sequence Num: " + message[2])
+        ateConfig.log.logger.debug("DUT Heartbeat Status: " + heartbeatStatus + ", Sequence Num: " + message[2])
 
     def processTestStatus(self, message):
         '''
@@ -503,7 +496,7 @@ class SerialApp:
         :return: none
         '''
         testStatus = message[3:-4]
-        nanoConfig.log.logger.debug("Test Completion Status" + testStatus)
+        ateConfig.log.logger.debug("Test Completion Status" + testStatus)
 
     def sendMessage(self, message):
         '''

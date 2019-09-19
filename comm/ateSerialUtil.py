@@ -1,4 +1,6 @@
 
+from configuration import ateConfig
+
 # common time delays
 MSECS_5  = 0.005
 USECS_100 = 0.0001
@@ -135,15 +137,13 @@ def crc8Calc(message):
             crc = crc8Table[(int(crc) ^ int(byteValue)) & 0xFF]
             num += 1
 
-            # print( "Num Bytes: " + str(num))
-        # print( "Num Bytes: " + str(num))
+        ateConfig.log.logger.debug( "Num Bytes: " + str(num))
 
         # Some CRC implementations xor the final value with some other value.
         crc ^= 0xa5
 
     except TypeError as error:
-        print("TypeError - " + str(error))
-        # print("TypeError - " + str(error))
+        ateConfig.log.logger.error("TypeError - " + str(error))
 
     return crc & 0xFF
 
@@ -175,15 +175,13 @@ def crc32Calc(message):
         for byteValue in message:
             crc = crc32Table[(int(byteValue) & 0xFF) ^ (crc & 0xFF)] ^ (crc >> 8)
 
-        # nanoConfig.log.logger.debug("Num Bytes: " + str(len(message)))
-        # print("Num Bytes: " + str(len(message)))
+        ateConfig.log.logger.debug("Num Bytes: " + str(len(message)))
 
         # Some CRC implementations xor the final value with some other value.
         crc ^= 0xFFFFFFFF
 
     except TypeError as error:
-        # nanoConfig.log.logger.error("TypeError - " + str(error))
-        print("TypeError - " + str(error))
+        ateConfig.log.logger.error("TypeError - " + str(error))
 
     return crc
 

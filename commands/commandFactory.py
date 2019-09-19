@@ -1,12 +1,12 @@
-from ate_settings import *
+# from ate_settings import *
 # from commands.dmmCmd import DmmCmd
 # from commands.gpioCmd import GpioCmd
-# from commands.delayCmd import DelayCmd
+from commands.delayCmd import DelayCmd
 from commands.serialCmd import SerialCmd
 # from commands.bleCmd import BleCmd
 # from commands.audioCmd import AudioCmd
 # from commands.logCmd import LogCmd
-
+STATION_ID = '3'
 # If it is ATE 1, import the power supply and flash command classes.
 if STATION_ID == '1':
     from commands.psCmd import PsCmd
@@ -32,7 +32,7 @@ class CommandFactory:
     objectTypes = {
         "serial"    : SerialCmd,
         # "io"	    : GpioCmd,
-        # "delay"		: DelayCmd,
+        "delay"		: DelayCmd,
         # "ble"		: BleCmd,
         # "dmm"       : DmmCmd,
         # "audio"     : AudioCmd,

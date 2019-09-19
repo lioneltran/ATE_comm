@@ -13,7 +13,7 @@ Usage:  log = Log(); log.logger.info("")
 
 '''
 
-ATE_LOG_PATH = '/home/nano/ATE_comm/logs/'
+ATE_LOG_PATH = '/home/nano/Desktop/ateTestLogs/'
 
 # number of milliseconds in 30 seconds
 SEC_30_TIMER = 30000
@@ -90,7 +90,7 @@ class Log:
         self._currentDefaultLoggerLevel = self._logger.getEffectiveLevel()
 
         # reset the queueHandler log level which streams logs to the process to write to log file
-        self._loggerQueueHandler.setLevel(logging.DEBUG)
+        self._loggerQueueHandler.setLevel(logLevel)
         # print("QueueHandler Current LogLevel - " + str(logLevel))
 
     def restoreDefaultLogLevel(self):
@@ -98,7 +98,7 @@ class Log:
         Restores the logger to its default log level, everything on.
         :return:
         '''
-        self._logger.setLevel(logging.DEBUG)
+        self._logger.setLevel(self._currentDefaultLoggerLevel)
         # print("Enable Current LogLevel - " + str(self._logger.getEffectiveLevel()))
 
     def createLoggerConsoleHandler(self, minLevel=logging.INFO):
@@ -109,7 +109,7 @@ class Log:
 
         # create console handler and set level
         self._conoleStreamHandler = logging.StreamHandler()
-        self._conoleStreamHandler.setLevel(logging.DEBUG)
+        self._conoleStreamHandler.setLevel(minLevel)
 
         # add formatter with abbreviated log stream for the console
         formatter = logging.Formatter("%(asctime)s;%(levelname)-5s - %(message)s")
@@ -126,7 +126,7 @@ class Log:
         '''
 
         # put here to circumvent circular import error dependencies
-        from tests.scenario import Scenario
+        # from tests.scenario import Scenario
 
         pathname = ''
 
@@ -142,9 +142,10 @@ class Log:
             pathname = path + file
         else:
             # Log filename to include DUT serial number and test start time
-            filename = 'ATE_{}-{}_{}_{}.log'.format(Scenario.ateTestAttr['station'], Scenario.ateTestAttr['stationIndex'],
-                                                   Scenario.ateTestAttr['internal_serial_number'],
-                                                   Scenario.ateTestAttr['testStartTime'])
+            # filename = 'ATE_{}-{}_{}_{}.log'.format(Scenario.ateTestAttr['station'], Scenario.ateTestAttr['stationIndex'],
+            #                                        Scenario.ateTestAttr['internal_serial_number'],
+            #                                        Scenario.ateTestAttr['testStartTime'])
+            filename = 'Nano.log'
             pathname = path + filename
 
         return pathname
@@ -163,7 +164,7 @@ class Log:
 
         # Setup output file using console output output format attributes
         self._fileHandler = logging.FileHandler(self._pathname)
-        self._fileHandler.setLevel(logging.DEBUG)
+        self._fileHandler.setLevel(logLevel)
         self._fileHandler.setFormatter(self._formatter)
 
         # logger is now setup to output to the file at the default application path

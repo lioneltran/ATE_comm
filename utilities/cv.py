@@ -13,8 +13,8 @@ import time
 import cv2
 import math
 import random
-from configuration import nanoConfig
-from configuration.nanoConfig import *
+from configuration import ateConfig
+from configuration.ateConfig import *
 from configuration.cvConfig import *
 
 class CV():
@@ -29,7 +29,7 @@ class CV():
         :param name:
         :return:
         '''
-        nanoConfig.log.logger.debug('Read image: %s' % (path+name+'.jpeg'))
+        ateConfig.log.logger.debug('Read image: %s' % (path+name+'.jpeg'))
         image = cv2.imread(path+name+'.jpeg')
         return image
 
@@ -42,7 +42,7 @@ class CV():
         :param name:
         :return: None
         '''
-        nanoConfig.log.logger.debug('Write image to:%s' % (path+name+'.jpeg'))
+        ateConfig.log.logger.debug('Write image to:%s' % (path+name+'.jpeg'))
         cv2.imwrite(path+name+'.jpeg', image)
 
     def showImage(self, path, name):
@@ -52,7 +52,7 @@ class CV():
         :param name:
         :return: None
         '''
-        nanoConfig.log.logger.info('Show image: %s' %name)
+        ateConfig.log.logger.info('Show image: %s' %name)
         img = self.readImage(path, name)
         cv2.imshow(name, img)
         k = cv2.waitKey(0)
@@ -71,7 +71,7 @@ class CV():
         :param writeName:
         :return: None
         '''
-        nanoConfig.log.logger.info('Cropping image')
+        ateConfig.log.logger.info('Cropping image')
         image = self.readImage(path, name)
         crop_image = image[y:yDist, x:xDist]
         self.writeImage(crop_image, writePath, writeName)
@@ -88,7 +88,7 @@ class CV():
         :param writeName:
         :return: None
         '''
-        nanoConfig.log.logger.info('Subtract two images')
+        ateConfig.log.logger.info('Subtract two images')
         imageOne = self.readImage(pathOne, nameOne)
         imageTwo = self.readImage(pathTwo, nameTwo)
         img1_gray = cv2.cvtColor(imageOne, cv2.COLOR_BGR2GRAY)
@@ -106,7 +106,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Image Dilation')
+        ateConfig.log.logger.info('Image Dilation')
         image = self.readImage(path, name)
         image = cv2.dilate(image, kernel, iterations=3)
         self.writeImage(image, writePath, writeName)
@@ -121,7 +121,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Image Erosion')
+        ateConfig.log.logger.info('Image Erosion')
         image = self.readImage(path, name)
         image = cv2.erode(image, kernel, iterations=1)
         self.writeImage(image, writePath, writeName)
@@ -136,7 +136,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Do image openning')
+        ateConfig.log.logger.info('Do image openning')
         image = self.readImage(path, name)
         img_erosion = cv2.erode(image, kernel, iterations=1)
         img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
@@ -149,7 +149,7 @@ class CV():
         :param kernel:
         :return:
         '''
-        nanoConfig.log.logger.info('Do image openning')
+        ateConfig.log.logger.info('Do image openning')
         img_erosion = cv2.erode(image, kernel, iterations=1)
         img_dilation = cv2.dilate(img_erosion, kernel, iterations=1)
         return img_dilation
@@ -164,7 +164,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Do image closing')
+        ateConfig.log.logger.info('Do image closing')
         image = self.readImage(path, name)
         img_dilation = cv2.dilate(image, kernel, iterations=1)
         img_closing = cv2.erode(img_dilation, kernel, iterations=1)
@@ -177,7 +177,7 @@ class CV():
         :param kernel:
         :return:
         '''
-        nanoConfig.log.logger.info('Do image closing')
+        ateConfig.log.logger.info('Do image closing')
         img_dilation = cv2.dilate(image, kernel, iterations=1)
         img_closing = cv2.erode(img_dilation, kernel, iterations=1)
         return img_closing
@@ -189,7 +189,7 @@ class CV():
         :param name:
         :return:
         '''
-        nanoConfig.log.logger.info('Resize image')
+        ateConfig.log.logger.info('Resize image')
         image = self.readImage(path, name)
         r = IMAGE_RESIZE / image.shape[1]
         dim = (IMAGE_RESIZE, int(image.shape[0] * r))
@@ -205,7 +205,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Blur Image')
+        ateConfig.log.logger.info('Blur Image')
         image = self.readImage(path, name)
         img_blur = cv2.medianBlur(image, BLUR_KSIZE_3)
         self.writeImage(img_blur, writePath, writeName)
@@ -221,7 +221,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Convert image to binary image via invert binary method')
+        ateConfig.log.logger.info('Convert image to binary image via invert binary method')
         image = self.readImage(path, name)
         # Convert image to binary image using invert binary
         ret, image_inv_binary = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY_INV)
@@ -239,7 +239,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Convert image to binary image via binary method')
+        ateConfig.log.logger.info('Convert image to binary image via binary method')
         image = self.readImage(path, name)
         ret, image_binary = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)
         image = cv2.erode(image_binary, kernel, iterations=1)
@@ -258,7 +258,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Edge Detection in the image')
+        ateConfig.log.logger.info('Edge Detection in the image')
         image = self.readImage(path, name)
         edges_img = cv2.Canny(image, CANNY_THRESHOLD_1, CANNY_THRESHOLD_2, APERTURE_SIZE)
         # edge_opening = self.openingImagewithoutPath(edges_img, kernel)
@@ -274,7 +274,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Find and draw overlap circle center...')
+        ateConfig.log.logger.info('Find and draw overlap circle center...')
         image = self.readImage(path, name)
         image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         height, width = image_gray.shape
@@ -306,7 +306,7 @@ class CV():
             self.writeImage(image, path, "overlapOuterEdge")
 
         if DEBUG_MODE:
-            nanoConfig.log.logger.debug('Ellipse: ' + str(ellipse))
+            ateConfig.log.logger.debug('Ellipse: ' + str(ellipse))
 
         #Crop only center of eink
         crop_image = image_gray[CONCENTRICITY_CROP_Y1: CONCENTRICITY_CROP_Y2, CONCENTRICITY_CROP_X1:CONCENTRICITY_CROP_X2]
@@ -321,7 +321,7 @@ class CV():
         cnt = contours[max_index]
         ellipse = cv2.fitEllipse(cnt)
         if DEBUG_MODE:
-            nanoConfig.log.logger.debug('Ellipse: ' +str(ellipse))
+            ateConfig.log.logger.debug('Ellipse: ' +str(ellipse))
         #Get ellipse data
         (x,y) = ellipse[0]
         (MA, ma) = ellipse[1]
@@ -357,7 +357,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Bitwise_And two images')
+        ateConfig.log.logger.info('Bitwise_And two images')
         imageOne = self.readImage(pathOne, nameOne)
         imageTwo = self.readImage(pathTwo, nameTwo)
         img_and = cv2.bitwise_and(imageOne, imageTwo)
@@ -376,7 +376,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Bitwise or two images')
+        ateConfig.log.logger.info('Bitwise or two images')
         imageOne = self.readImage(pathOne, nameOne)
         imageTwo = self.readImage(pathTwo, nameTwo)
         img_and = cv2.bitwise_or(imageOne, imageTwo)
@@ -390,7 +390,7 @@ class CV():
         :param y:
         :return:
         '''
-        nanoConfig.log.logger.info('Finding coordinates of error pixel')
+        ateConfig.log.logger.info('Finding coordinates of error pixel')
         quadrant1=0
         quadrant2=0
         quadrant3=0
@@ -417,7 +417,7 @@ class CV():
         :param writeName:
         :return: Total error positions and total erros in each quadrant
         '''
-        nanoConfig.log.logger.info('Finding dead pixel on image...')
+        ateConfig.log.logger.info('Finding dead pixel on image...')
         binary_image = self.readImage(binImagePath, binImageName)
         # contours = self.findContoursinImage(binImagePath, binImageName)
         binary_image = cv2.cvtColor(binary_image, cv2.COLOR_BGR2GRAY)
@@ -471,7 +471,7 @@ class CV():
         result['yRect'] = y
         result['wRect'] = w
         result['hRect'] = h
-        # nanoConfig.log.logger.info('Dead pixel result: ' + str(result))
+        # ateConfig.log.logger.info('Dead pixel result: ' + str(result))
         return result
 
     def correlationTwoImages(self, pathOne, nameOne, pathTwo, nameTwo):
@@ -507,7 +507,7 @@ class CV():
         result = {}
         max_index = 0
         max_area  = RECT_MIN_AREA
-        nanoConfig.log.logger.info('Finding Rectangle in eInk...')
+        ateConfig.log.logger.info('Finding Rectangle in eInk...')
         image = self.readImage(path, name)
         img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         # img_blur = cv2.medianBlur(img_gray, BLUR_KSIZE_3)
@@ -550,7 +550,7 @@ class CV():
         :param writeName:
         :return: data of ellipse: (x, y), (MA, ma)
         '''
-        nanoConfig.log.logger.info('Find Fiducial ...')
+        ateConfig.log.logger.info('Find Fiducial ...')
         image = self.readImage(path, name)
         result = {}
 
@@ -576,7 +576,7 @@ class CV():
                     if ma/MA < FIFUCIAL_MA_ma_RATIO:
                         max_index = i
                         best_area = areas[i]
-                        nanoConfig.log.logger.debug('Area: %s' % areas[i])
+                        ateConfig.log.logger.debug('Area: %s' % areas[i])
             if best_area != 0:
                 # max_index = np.argmax(areas)
                 cnt = contours[max_index]
@@ -590,10 +590,10 @@ class CV():
                     print(ellipse)
                     self.writeImage(img, DIANA_IMAGE, "fiducialEllipse")
                 break
-            nanoConfig.log.logger.debug('Try next binary threshold')
+            ateConfig.log.logger.debug('Try next binary threshold')
         return result
 
-    def chassisHoleDetection(self, path, name, threshold, min_area, max_area, writePath, writeName):
+    def chassisHoleDetection(self, path, name, min_area, max_area, writePath, writeName):
         '''
         Find chassis hole
         :param path:
@@ -602,13 +602,13 @@ class CV():
         :param writeName:
         :return: coordinates of 2 centers and radius value
         '''
-        nanoConfig.log.logger.info('Finding chassis hole')
+        ateConfig.log.logger.info('Finding chassis hole')
         image = self.readImage(path, name)
         result = {}
 
         image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        for value in threshold:
-            ret, image_binary = cv2.threshold(image_gray, value, 255, cv2.THRESH_BINARY_INV)
+        for threshold in HOLE_THRES_BINARY:
+            ret, image_binary = cv2.threshold(image_gray, threshold, 255, cv2.THRESH_BINARY_INV)
             # image_binary = cv2.erode(image_binary, KERNEL2, iterations=1)
             image_binary = cv2.dilate(image_binary, KERNEL2, iterations=1)
             if DEBUG_MODE:
@@ -626,7 +626,7 @@ class CV():
                     if ma/MA < HOLE_MA_ma_RATIO:
                         max_index = i
                         best_area = areas[i]
-                        nanoConfig.log.logger.debug('Area: %s' % areas[i])
+                        ateConfig.log.logger.debug('Area: %s' % areas[i])
             if best_area != 0:
                 # max_index = np.argmax(areas)
                 cnt = contours[max_index]
@@ -639,7 +639,7 @@ class CV():
                     img = cv2.ellipse(image, ellipse, (0, 0, 255), 2)
                     self.writeImage(img, DIANA_IMAGE, name+"_holeEllipse")
                 break
-            nanoConfig.log.logger.debug('Try next binary threshold')
+            ateConfig.log.logger.debug('Try next binary threshold')
         return result
 
     def pinionDetection(self, path, name, writePath, writeName):
@@ -653,7 +653,7 @@ class CV():
         '''
         result  = {}
 
-        nanoConfig.log.logger.info('Finding Pinion...')
+        ateConfig.log.logger.info('Finding Pinion...')
         image = self.readImage(path, name)
 
         image_blur = cv2.GaussianBlur(image, GAUSSIAN_BLUR_KSIZE_3, 0)
@@ -674,7 +674,7 @@ class CV():
                 if areas[i] > PINION_MIN_AREA and areas[i] < PINION_MAX_AREA:
                     max_index = i
                     best_area = areas[i]
-                    nanoConfig.log.logger.debug('Area: %s' % areas[i])
+                    ateConfig.log.logger.debug('Area: %s' % areas[i])
             if best_area != 0:
                 # max_index = np.argmax(areas)
                 cnt = contours[max_index]
@@ -683,11 +683,11 @@ class CV():
                 result['area']  = best_area
                 result['threshold'] = threshold
                 if DEBUG_MODE:
-                    nanoConfig.log.logger.debug('Ellipse: ' + str(ellipse))
+                    ateConfig.log.logger.debug('Ellipse: ' + str(ellipse))
                     cv2.ellipse(image, ellipse, (0, 0, 255), 2)
                     self.writeImage(image, DIANA_IMAGE, "testPinion")
                 break
-            nanoConfig.log.logger.debug('Try next binary threshold')
+            ateConfig.log.logger.debug('Try next binary threshold')
         return result
 
     def eInkCenterCirleDetection(self, path, name, writePath, writeName):
@@ -701,7 +701,7 @@ class CV():
         '''
         result  = {}
 
-        nanoConfig.log.logger.info('Finding EInk Outer Center Circle...')
+        ateConfig.log.logger.info('Finding EInk Outer Center Circle...')
         image = self.readImage(path, name)
 
         image = cv2.GaussianBlur(image, GAUSSIAN_BLUR_KSIZE_3, 0)
@@ -729,7 +729,7 @@ class CV():
                 if areas[i] > EINK_MIN_AREA and areas[i] < EINK_MAX_AREA:
                     max_index = i
                     best_area = areas[i]
-                    nanoConfig.log.logger.debug('Area: %s' %areas[i])
+                    ateConfig.log.logger.debug('Area: %s' %areas[i])
             if best_area != 0:
                 # max_index = np.argmax(areas)
                 cnt = contours[max_index]
@@ -739,11 +739,11 @@ class CV():
                 result['threshold'] = threshold
                 result['cnt'] = cnt
                 if DEBUG_MODE:
-                    nanoConfig.log.logger.debug('Ellipse: ' + str(ellipse))
+                    ateConfig.log.logger.debug('Ellipse: ' + str(ellipse))
                     cv2.ellipse(image, ellipse, (0, 0, 255), 2)
                     self.writeImage(image, DIANA_IMAGE, "testeInkCenter")
                 break
-            nanoConfig.log.logger.debug('Try next binary threshold')
+            ateConfig.log.logger.debug('Try next binary threshold')
         return result
 
     def imageWithMask(self, path, name, rMask, xcenter, ycenter, writePath, writeName):
@@ -755,7 +755,7 @@ class CV():
         :param writeName:
         :return: and image
         '''
-        nanoConfig.log.logger.info('Do bitwise_and image with mask...')
+        ateConfig.log.logger.info('Do bitwise_and image with mask...')
         img = self.readImage(path, name)
         gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         height, width = gray_image.shape
@@ -778,7 +778,7 @@ class CV():
         result = {}
         max_index = 0
         max_area  = LED_MIN_AREA
-        nanoConfig.log.logger.info('Analyzing image histogram...')
+        ateConfig.log.logger.info('Analyzing image histogram...')
         image = self.readImage(path, name)
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         # change to binary image
@@ -801,7 +801,7 @@ class CV():
                 max_index = i
         if max_area > LED_MIN_AREA:
             result['area'] = max_area
-            nanoConfig.log.logger.debug('Max LED active region: %s' %max_area)
+            ateConfig.log.logger.debug('Max LED active region: %s' %max_area)
             cnt = contours[max_index]
             ellipse = cv2.fitEllipse(cnt)
             result['led'] = ellipse
@@ -827,7 +827,7 @@ class CV():
         :param L2:
         :return:
         '''
-        nanoConfig.log.logger.debug("Find intersection point between 2 lines from 4 points")
+        ateConfig.log.logger.debug("Find intersection point between 2 lines from 4 points")
         result = {}
         A1 = (p1[1] - p2[1])
         B1 = (p2[0] - p1[0])
@@ -847,7 +847,7 @@ class CV():
             y = Dy / D
             result['x'] = int(x)
             result['y'] = int(y)
-            nanoConfig.log.logger.debug("Intersection coordinate: (%s, %s)" %(int(x), int(y)))
+            ateConfig.log.logger.debug("Intersection coordinate: (%s, %s)" %(int(x), int(y)))
 
         return result
 
@@ -858,7 +858,7 @@ class CV():
         :return: angle of two hands
         '''
         result = {}
-        nanoConfig.log.logger.debug("Finding hands position...")
+        ateConfig.log.logger.debug("Finding hands position...")
 
         image = self.readImage(path, name)
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -884,6 +884,7 @@ class CV():
                 #Get MA of maximun ellipse
                 MA = ellip[1][0]
                 for cnt in cnts:
+                    ateConfig.log.logger.debug("Hand size: %s" %cnt.size)
                     if cnt.size > HAND_MINIMUM_POINT:
                         ellip = cv2.fitEllipse(cnt)
                         angle = ellip[2]
@@ -924,12 +925,12 @@ class CV():
                 result['hand_angle'] = hand_angle
                 result['ellipse'] = ellipse
                 if DEBUG_MODE:
-                    nanoConfig.log.logger.debug('Hands angle: %s' %hand_angle)
+                    ateConfig.log.logger.debug('Hands angle: %s' %hand_angle)
                 break
             else:
                 result['hand_angle'] = hand_angle
                 result['ellipse'] = ellipse
-                nanoConfig.log.logger.debug('Try next binary threshold')
+                ateConfig.log.logger.debug('Try next binary threshold')
         return result
 
     def RANSAC_circledetection(self, cnt, inline_threshold, number_point):
@@ -1005,7 +1006,7 @@ class CV():
 
         result = {}
 
-        nanoConfig.log.logger.info('Finding Dial Watch...')
+        ateConfig.log.logger.info('Finding Dial Watch...')
         # read two image
         imageOne = self.readImage(pathOne, nameOne)
         imageTwo = self.readImage(pathTwo, nameTwo)
@@ -1051,7 +1052,7 @@ class CV():
                             dist = math.sqrt((w / 2 - circle[0][0]) ** 2 + (h / 2 - circle[0][1]) ** 2)
                             if dist < MAX_CENTER_DISTANCE:
                                 dials.append(circle)
-                                # nanoConfig.log.logger.debug("Found cirles: %s" %circle)
+                                # ateConfig.log.logger.debug("Found cirles: %s" %circle)
                 for dial in dials:
                     if dial[1] > DIAL_RADIUS_MIN and dial[1] < DIAL_RADIUS_MAX:
                         best_circle = dial
@@ -1094,7 +1095,7 @@ class CV():
 
         result = {}
 
-        nanoConfig.log.logger.info('Finding EInk Circle...')
+        ateConfig.log.logger.info('Finding EInk Circle...')
 
         # read two image
         imageOne = self.readImage(pathOne, nameOne)
@@ -1117,9 +1118,8 @@ class CV():
                 self.writeImage(image2_binary, pathOne, 'binary_eInkCircle_2_'+str(threshold))
 
             # delete hands via masks
-            hand_mask = np.zeros((int(h/2+HAND_SHIFT), HAND_WIDTH), np.uint8)
-            image1_binary[int(0):int(h/2+HAND_SHIFT), int(dialCenter[0] - HAND_WIDTH/2):int(dialCenter[0] + HAND_WIDTH/2)] = hand_mask
-            image2_binary[int(h/2-HAND_SHIFT):int(h), int(dialCenter[0] - HAND_WIDTH/2):int(dialCenter[0] + HAND_WIDTH/2)] = hand_mask
+            image1_binary[int(0):int(dialCenter[1]+HAND_SHIFT), int(dialCenter[0] - HAND_WIDTH/2):int(dialCenter[0] + HAND_WIDTH/2)] = 0
+            image2_binary[int(dialCenter[1]-HAND_SHIFT):int(h), int(dialCenter[0] - HAND_WIDTH/2):int(dialCenter[0] + HAND_WIDTH/2)] = 0
 
             #Write image to debug and calibration in the factory
             if DEBUG_MODE:
@@ -1152,7 +1152,7 @@ class CV():
             if circle != '':
                 break
             else:
-                nanoConfig.log.logger.debug('Try next binary threshold')
+                ateConfig.log.logger.debug('Try next binary threshold')
 
         return result
 
@@ -1169,7 +1169,7 @@ class CV():
         :return:
         '''
 
-        nanoConfig.log.logger.info('Removing hands...')
+        ateConfig.log.logger.info('Removing hands...')
 
         # read two image
         imageOne = self.readImage(pathOne, nameOne)
@@ -1209,7 +1209,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Find and draw overlap circle center...')
+        ateConfig.log.logger.info('Find and draw overlap circle center...')
 
         # Read image and convert to gray
         image1 = self.readImage(pathOne, nameOne)  # mask
@@ -1240,7 +1240,7 @@ class CV():
 
         ellipse = cv2.fitEllipse(cnts[0])
         if DEBUG_MODE:
-            nanoConfig.log.logger.debug('Ellipse: ' + str(ellipse))
+            ateConfig.log.logger.debug('Ellipse: ' + str(ellipse))
         # Get ellipse data
         (x, y) = ellipse[0]
         (MA, ma) = ellipse[1]
@@ -1268,7 +1268,7 @@ class CV():
         :return:
         '''
         result = {}
-        nanoConfig.log.logger.info('Erase brand text on watch face...')
+        ateConfig.log.logger.info('Erase brand text on watch face...')
 
         # Read image and convert to binary
         image1 = self.readImage(pathOne, nameOne)
@@ -1325,7 +1325,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Edge Detection in the image')
+        ateConfig.log.logger.info('Edge Detection in the image')
 
         # Read image and convert to gary
         image = self.readImage(path, name)
@@ -1350,7 +1350,7 @@ class CV():
         :param writeName:
         :return:
         '''
-        nanoConfig.log.logger.info('Convert image to binary image via adaptive threshold method')
+        ateConfig.log.logger.info('Convert image to binary image via adaptive threshold method')
         image = self.readImage(path, name)
         # Convert image to binary image using invert binary
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -1374,7 +1374,7 @@ class CV():
         hist = cv2.calcHist([image_gray], [0], None, [256], [0, 256])
         #only get mean from pixel has value 20 since most of image is black
         mean_hist = np.mean(hist[DIAL_MEAN_START_PIXEL:])
-        nanoConfig.log.logger.debug('Average of histogram: %s' %mean_hist)
+        ateConfig.log.logger.debug('Average of histogram: %s' %mean_hist)
         '''
         Based on dial histogram:
             - Clarify dial platform: black or white
@@ -1400,7 +1400,7 @@ class CV():
                 result['threshold'] = DIAL_BINARY_LEVEL_6
             else:
                 result['threshold'] = DIAL_BINARY_LEVEL_7
-        nanoConfig.log.logger.info('Dial platform: %s' % result['platform'])
+        ateConfig.log.logger.info('Dial platform: %s' % result['platform'])
 
         return result
 
@@ -1411,7 +1411,7 @@ class CV():
         :param name:
         :return: image without brand name
         '''
-        nanoConfig.log.logger.info('Extracting Brand Name...')
+        ateConfig.log.logger.info('Extracting Brand Name...')
         result = {}
         image = self.readImage(path, name)
         image_cp = image.copy()
@@ -1433,7 +1433,7 @@ class CV():
         for c in cnts:
             x, y, w, h = cv2.boundingRect(c)
             # if DEBUG_MODE:
-            #     nanoConfig.log.logger.debug("area icon: %s" % (w * h))
+            #     ateConfig.log.logger.debug("area icon: %s" % (w * h))
             #Get the brand area
             if w * h > BRAND_MIN_AREA and w * h < BRAND_MAX_AREA and w/h > BRAND_NAME_RATIO:
                 xIcon.append(x)

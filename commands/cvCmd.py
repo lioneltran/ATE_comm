@@ -123,7 +123,7 @@ class CVCmd(Command):
             elif self._operation == 'findFudical':
                 result = CVCmd._cv.fiducialDetection(self._imageOnePath, self._imageOneName, self._outImagePath, self._outImageName)
             elif self._operation == 'findHole':
-                result = CVCmd._cv.chassisHoleDetection(self._imageOnePath, self._imageOneName, self._threshold, self._minArea, self._maxArea, self._outImagePath, self._outImageName)
+                result = CVCmd._cv.chassisHoleDetection(self._imageOnePath, self._imageOneName, self._minArea, self._maxArea, self._outImagePath, self._outImageName)
             elif self._operation == 'findPinion':
                 result = CVCmd._cv.pinionDetection(self._imageOnePath, self._imageOneName, self._outImagePath, self._outImageName)
             elif self._operation == 'findEink':

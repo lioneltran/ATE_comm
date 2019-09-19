@@ -3,7 +3,7 @@
 HandDragTest Class
 Created: 2018 May 14
 Author: Robert Vo
-Updated: Thien Doan 2018 Aug 17
+Updated: 2019 Sep 18 by Lionel Tran
 
 Description:
 Implementation of HandDragTest class.
@@ -11,9 +11,9 @@ This class is the method in which ATE detect
 hand position after moving to specific position.
 """
 import time as time
-from configuration.nanoConfig import *
+from configuration.ateConfig import *
 from configuration.cvConfig import *
-from configuration import nanoConfig
+# from configuration import nanoConfig
 # from configuration.bleConfig import *
 from tests.test import Test
 import cv2
@@ -100,9 +100,9 @@ class HandDragTestNano(Test):
         - Distance from fudical and test point to Rectangle edge
         - Angle between rectangle bottom edge and horizontal
         '''
-        nanoConfig.log.logger.info('=====================================================================')
-        nanoConfig.log.logger.info('   Test Started   - ' + self._name)
-        nanoConfig.log.logger.info('=====================================================================')
+        ateConfig.log.logger.info('=====================================================================')
+        ateConfig.log.logger.info('   Test Started   - ' + self._name)
+        ateConfig.log.logger.info('=====================================================================')
         cmdResponse = ''
         startTime = time.time()
         # internal_SN = (tests.scenario.Scenario.ateTestAttr['internal_serial_number'])
@@ -146,18 +146,18 @@ class HandDragTestNano(Test):
                         result['offset_angle'] = offset_angle
                         ellipse = cmdResponse['ellipse']
                         original_hand['ellipse'] = ellipse
-                        nanoConfig.log.logger.info('Offset angle: %s' %offset_angle)
+                        ateConfig.log.logger.info('Offset angle: %s' %offset_angle)
                         # draw hands and write hand angle on image
                         image = cv2.imread(DIANA_IMAGE_RAW + 'hand_drag_12hour.jpeg')
                         cv2.ellipse(image, ellipse[0], (0, 0, 255), 4)
                         cv2.putText(image, 'offset_angle: %s' % offset_angle, (50, 50), cv2.FONT_ITALIC, 2,(255, 255, 255), 2, cv2.LINE_AA)
-                        # # save image
+                        # save image
                         image = cv2.resize(image, (0, 0), fx=0.5, fy=0.5)
                         # cv2.imwrite(tests.scenario.Scenario.ateTestAttr['logPath'] + "HandDrag_Offset_" + internal_SN + "_" + str(filetimestamp) + ".jpeg",image)
                         cv2.imwrite(PROCESSED_IMAGES + "HandDrag_Offset_" + internal_SN + "_" + str(filetimestamp) + ".jpeg",image)
                     else:
                         testRes.append(False)
-                        nanoConfig.log.logger.info('Cannot detect hands. Hands may be not move')
+                        ateConfig.log.logger.info('Cannot detect hands. Hands may be not move')
                         image = cv2.imread(DIANA_IMAGE_RAW + 'hand_drag_12hour.jpeg')
                         image = cv2.resize(image, (0, 0), fx=0.5, fy=0.5)
                         # cv2.imwrite(tests.scenario.Scenario.ateTestAttr['logPath'] + "HandDrag_Offset_" + internal_SN + "_" + str(filetimestamp) + ".jpeg",image)
@@ -169,7 +169,7 @@ class HandDragTestNano(Test):
                     #SW cannot detect hands
                     if (len(cmdResponse['hand_angle'])) == 0:
                         testRes.append(False)
-                        nanoConfig.log.logger.info('Cannot detect hands')
+                        ateConfig.log.logger.info('Cannot detect hands')
                         image = cv2.resize(image, (0, 0), fx=0.5, fy=0.5)
                         cv2.imwrite(PROCESSED_IMAGES + "HandDrag_6hour_" + internal_SN + "_" + str(filetimestamp) + ".jpeg", image)
                     #SW detect hands
@@ -177,15 +177,15 @@ class HandDragTestNano(Test):
                         #Get hands angles
                         minute_hand = round(abs(cmdResponse['hand_angle'][0] - offset_angle), 2)
                         hour_hand = round(abs(cmdResponse['hand_angle'][1] - offset_angle), 2)
-                        nanoConfig.log.logger.info('Minute hand : %s' % (minute_hand))
-                        nanoConfig.log.logger.info('Hour hand   : %s' % (hour_hand))
+                        ateConfig.log.logger.info('Minute hand : %s' % (minute_hand))
+                        ateConfig.log.logger.info('Hour hand   : %s' % (hour_hand))
                         result['6_00_hands_angle'] = [hour_hand, minute_hand]
                         if ((abs(minute_hand) < cmd.lowerLimit or abs(minute_hand) > cmd.upperLimit)) or ((abs(hour_hand) < cmd.lowerLimit or abs(hour_hand) > cmd.upperLimit)):
                             testRes.append(False)
-                            nanoConfig.log.logger.info('Hand at wrong position')
+                            ateConfig.log.logger.info('Hand at wrong position')
                         else:
                             testRes.append(True)
-                            nanoConfig.log.logger.info('Hand at 6:00 position')
+                            ateConfig.log.logger.info('Hand at 6:00 position')
 
                         cv2.putText(image, 'Minute Angle: %s' % minute_hand, (50, 50), cv2.FONT_ITALIC, 2, (0, 0, 255),2, cv2.LINE_AA)
                         cv2.putText(image, 'Hour   Angle: %s' % hour_hand, (50, 120), cv2.FONT_ITALIC, 2, (0, 0, 255), 2, cv2.LINE_AA)
@@ -202,9 +202,9 @@ class HandDragTestNano(Test):
                     if (len(cmdResponse['hand_angle'])) == 0:
                         testRes.append(True)
                         result['12_00_hands_angle'] = [0, 0]
-                        nanoConfig.log.logger.info('Minute hand : 0')
-                        nanoConfig.log.logger.info('Hour hand   : 0')
-                        nanoConfig.log.logger.info('Hand at 12:00 position')
+                        ateConfig.log.logger.info('Minute hand : 0')
+                        ateConfig.log.logger.info('Hour hand   : 0')
+                        ateConfig.log.logger.info('Hand at 12:00 position')
                         cv2.putText(image, 'Minute Angle: 0', (50, 50), cv2.FONT_ITALIC, 2, (0, 0, 255),2, cv2.LINE_AA)
                         cv2.putText(image, 'Hour   Angle: 0', (50, 120), cv2.FONT_ITALIC, 2, (0, 0, 255), 2, cv2.LINE_AA)
                         image = cv2.resize(image, (0, 0), fx=0.5, fy=0.5)
@@ -217,15 +217,15 @@ class HandDragTestNano(Test):
                             minute_hand = round(360 - minute_hand, 2)
                         if hour_hand > 270:
                             hour_hand = round(360 - hour_hand, 2)
-                        nanoConfig.log.logger.info('Minute hand : %s' % (minute_hand))
-                        nanoConfig.log.logger.info('Hour hand   : %s' % (hour_hand))
+                        ateConfig.log.logger.info('Minute hand : %s' % (minute_hand))
+                        ateConfig.log.logger.info('Hour hand   : %s' % (hour_hand))
                         result['12_00_hands_angle'] = [hour_hand, minute_hand]
                         if abs(minute_hand) > cmd.limits or abs(hour_hand) > cmd.limits:
                             testRes.append(False)
-                            nanoConfig.log.logger.info('Hands at wrong position')
+                            ateConfig.log.logger.info('Hands at wrong position')
                         else:
                             testRes.append(True)
-                            nanoConfig.log.logger.info('Hands at 12:00 position')
+                            ateConfig.log.logger.info('Hands at 12:00 position')
                         for i in range(len(cmdResponse['ellipse'])):
                             cv2.ellipse(image, cmdResponse['ellipse'][i], (0, 0, 255), 4)
 
@@ -248,18 +248,18 @@ class HandDragTestNano(Test):
             # os.remove(DIANA_IMAGE + '6hour.jpeg')
             # os.remove(DIANA_IMAGE + '12hour.jpeg')
             os.remove(DIANA_IMAGE + 'subtractOrginal.jpeg')
-            # nanoConfig.log.logger.debug("File Removed!")
+            ateConfig.log.logger.debug("File Removed!")
 
             if False in testRes:
                 self._testResult['passed'] = False
-                nanoConfig.log.logger.info(self._name + ' failed')
+                ateConfig.log.logger.info(self._name + ' failed')
             else:
                 self._testResult['passed'] = True
-                nanoConfig.log.logger.info(self._name + ' passed.')
+                ateConfig.log.logger.info(self._name + ' passed.')
 
             self._testResult['data'] = result
-            nanoConfig.log.logger.info('   Test Result: %s' % result)
-            nanoConfig.log.logger.info('   Test Completed - ' + self._name)
+            ateConfig.log.logger.info('   Test Result: %s' % result)
+            ateConfig.log.logger.info('   Test Completed - ' + self._name)
 
             self.calcTestDuration(startTime)
 

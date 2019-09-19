@@ -121,8 +121,8 @@ class CVController():
         result = self.cv.fiducialDetection(path, name, writePath, writeName)
         return result
 
-    def chassisHoleDetection(self, path, name, threshold, min_area, max_area, writePath, writeName):
-        result = self.cv.chassisHoleDetection(path, name, threshold, min_area, max_area, writePath, writeName)
+    def chassisHoleDetection(self, path, name, min_area, max_area, writePath, writeName):
+        result = self.cv.chassisHoleDetection(path, name, min_area, max_area, writePath, writeName)
         return result
 
     def eInkCenterCirleDetection(self, path, name, writePath, writeName):

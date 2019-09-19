@@ -3,17 +3,18 @@ import logging
 import numpy as np
 import re
 import os
-from ate_settings import*
-from configuration import nanoConfig
+from configuration import ateConfig
 
 SAVE_FILES_LOCAL    = True
+STATION_ID = '3'
+ATE_ID = ''
 
 if STATION_ID == '1':
     SAVE_FILES_LOCAL = True
 
 if SAVE_FILES_LOCAL:
     # Store Images to Pi Local
-    DIANA_IMAGE                 = nanoConfig.DIANA_IMAGE
+    DIANA_IMAGE                 = ateConfig.DIANA_IMAGE
     CONCENTR_IMAGE              = DIANA_IMAGE + 'concentricity/'
     ALIGNMENT_IMAGE             = DIANA_IMAGE + 'alignment/'
     DEAD_PIXEL_IMAGE            = DIANA_IMAGE + 'deadPixels/'
@@ -21,7 +22,7 @@ if SAVE_FILES_LOCAL:
     HAND_DETECT_IMAGE           = DIANA_IMAGE + 'handDrag/'
 else:
     # Store Images to External USB Disk, "media/pi/ATE_IMAGES/", USB disk name/label must be: "ATE_IMAGES"
-    DIANA_IMAGE                 = nanoConfig.DIANA_IMAGE
+    DIANA_IMAGE                 = ateConfig.DIANA_IMAGE
     CONCENTR_IMAGE              = '/media/pi/ATE_IMAGES/Images/concentricity/'
     ALIGNMENT_IMAGE             = '/media/pi/ATE_IMAGES/Images/alignment/'
     DEAD_PIXEL_IMAGE            = '/media/pi/ATE_IMAGES/Images/deadPixels/'
@@ -112,7 +113,7 @@ if STATION_ID == '1' or STATION_ID == '2':
     CONCENTRICITY_CROP_Y2       = 1150
     PINION_X_CENTER             = 190
     PINION_Y_CENTER             = 160
-    PINION_BINARY_THRESHOLD     = [40, 50, 60, 70, 30, 20]
+    PINION_BINARY_THRESHOLD     = [40, 50, 60, 70]
     EINK_BINARY_THRESHOLD       = [40, 50, 60, 70]
     EINK_INNER_RADIUS           = 40
     EINK_OUTER_RADIUS           = 140
@@ -135,21 +136,11 @@ if STATION_ID == '1' or STATION_ID == '2':
     # For station DW.MM.2-Flex.1.ZH
     if ATE_ID == 'DW.MM.2-Flex.1.ZH':
         INTERFERENCE_OFFSET     = 0.034
+
     # For station DW.MM.2-Flex.2.ZH
     elif ATE_ID == 'DW.MM.2-Flex.2.ZH':
         INTERFERENCE_OFFSET     = 0.019
-    # For station DW.MM.2-Flex.3.ZH
-    elif ATE_ID == 'DW.MM.2-Flex.3.ZH':
-        INTERFERENCE_OFFSET     = 0.03
-    # For station DW.MM.2-Flex.4.ZH
-    elif ATE_ID == 'DW.MM.2-Flex.4.ZH':
-        INTERFERENCE_OFFSET     = 0.05
-    # For station DW.MM.2-Flex.5.ZH
-    elif ATE_ID == 'DW.MM.2-Flex.5.ZH':
-        INTERFERENCE_OFFSET     = 0.05
-    # For station DW.MM.2-Flex.6.ZH
-    elif ATE_ID == 'DW.MM.2-Flex.6.ZH':
-        INTERFERENCE_OFFSET     = 0.06
+
     # For station DW.MM.2-Flex.1.ZH
     elif ATE_ID == 'DW.MM.2-PT.1.SZ':
         INTERFERENCE_OFFSET     = 0.034
@@ -172,24 +163,23 @@ if STATION_ID == '1' or STATION_ID == '2':
 
     # Fiducial and Hole cropped positions
     FIDUCIAL_THRES_BINARY       = [240, 220, 200, 180, 150]
-    HOLE_1_THRES_BINARY           = [60, 70, 50, 40, 30, 20, 10]
-    HOLE_2_THRES_BINARY           = [40, 30, 20, 10, 60, 70, 50]
+    HOLE_THRES_BINARY           = [60, 70, 50, 40, 30, 20, 10]
     ALIGN_F1_CROP_X_1           = 380
     ALIGN_F1_CROP_X_2           = ALIGN_F1_CROP_X_1 + 200
     ALIGN_F1_CROP_Y_1           = 980
     ALIGN_F1_CROP_Y_2           = ALIGN_F1_CROP_Y_1 + 200
     ALIGN_F2_CROP_X_1           = 1990
     ALIGN_F2_CROP_X_2           = ALIGN_F2_CROP_X_1 + 200
-    ALIGN_F2_CROP_Y_1           = 680
-    ALIGN_F2_CROP_Y_2           = ALIGN_F2_CROP_Y_1 + 180
+    ALIGN_F2_CROP_Y_1           = 660
+    ALIGN_F2_CROP_Y_2           = ALIGN_F2_CROP_Y_1 + 200
     ALIGN_H1_CROP_X_1           = 400
     ALIGN_H1_CROP_X_2           = ALIGN_H1_CROP_X_1 + 200
     ALIGN_H1_CROP_Y_1           = 650
     ALIGN_H1_CROP_Y_2           = ALIGN_H1_CROP_Y_1 + 200
     ALIGN_H2_CROP_X_1           = 2000
     ALIGN_H2_CROP_X_2           = ALIGN_H2_CROP_X_1 + 200
-    ALIGN_H2_CROP_Y_1           = 1120
-    ALIGN_H2_CROP_Y_2           = ALIGN_H2_CROP_Y_1 + 180
+    ALIGN_H2_CROP_Y_1           = 1080
+    ALIGN_H2_CROP_Y_2           = ALIGN_H2_CROP_Y_1 + 200
     FIDUCIAL_RADIUS_MAX         = 26
     FIDUCIAL_RADIUS_MIN         = 22
     HOLE_RADIUS_MAX             = 40
@@ -236,19 +226,19 @@ elif STATION_ID == '3':
         MINIMUM_POINT                = 10
         # LIMIT_ANGLE                  = 3
         DIFF_RADIUS                  = 15
-        SIZE_HAND_COMPARE            = 5
+        SIZE_HAND_COMPARE            = 3
         # RADIUS_RATIO                 = 2
-        HAND_MINIMUM_POINT           = 350
+        HAND_MINIMUM_POINT           = 550
         # LED uniform params
         LED_THRES_BINARY             = 240
         HIST_LOWER_PIXEL_VALUE       = 200
         HIST_AVERAGE_LOWER_LIMIT     = 200
         HIST_INTERSECT_LOWER_LIMIT   = 100
-        HAND_THRES_BINARY            = [30, 40]
+        HAND_THRES_BINARY            = [30, 40, 25, 20]
         LED_MIN_AREA                 = 50
         MODULE_RADIUS                = 900
 
-        RECT_THRES_BINARY            = 50
+        RECT_THRES_BINARY            = 80
         ALIGN_RECT_CROP_X_1          = 1200
         ALIGN_RECT_CROP_X_2          = 1480
         ALIGN_RECT_CROP_Y_1          = 650
@@ -284,8 +274,6 @@ elif STATION_ID == '3':
         HOLE_2_MIN_AREA             = 900
         HOLE_2_MAX_AREA             = 1300
         HOLE_MA_ma_RATIO            = 1.7
-        HOLE_1_THRES_BINARY          = [60, 70, 50, 40, 30, 20, 10]
-        HOLE_2_THRES_BINARY          = [40, 30, 20, 10, 60, 70, 50]
         # Concentricity Test Params
         MAX_DIST_TWO_CENTERS         = 0.3179 #mm
         CONCENTRICITY_CROP_X1        = 600
@@ -293,7 +281,7 @@ elif STATION_ID == '3':
         CONCENTRICITY_CROP_Y1        = 250
         CONCENTRICITY_CROP_Y2        = 1650
         HAND_WIDTH                   = 170
-        HAND_SHIFT                   = 160
+        HAND_SHIFT                   = 100
         CONCENTRICITY_CIRLCE_CROP_X1 = 1030
         CONCENTRICITY_CIRLCE_CROP_X2 = 1660
         CONCENTRICITY_CIRLCE_CROP_Y1 = 620

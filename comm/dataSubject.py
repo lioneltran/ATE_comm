@@ -1,5 +1,5 @@
 
-from configuration import nanoConfig
+from configuration import ateConfig
 from utilities.subject import Subject
 
 ################################################################################
@@ -23,7 +23,7 @@ class DataSubject(Subject):
             else:
                 raise ValueError
         except ValueError:
-            nanoConfig.log.logger.error("ERROR: Observer already subscribed to Subject!")
+            ateConfig.log.logger.error("ERROR: Observer already subscribed to Subject!")
             raise ValueError
 
     def removeObserver(self, observer):
@@ -41,7 +41,7 @@ class DataSubject(Subject):
             else:
                 raise ValueError
         except ValueError:
-            nanoConfig.log.logger.error("ERROR: Observer currently not subscribed to Subject!")
+            ateConfig.log.logger.error("ERROR: Observer currently not subscribed to Subject!")
             raise ValueError
 
     def notifyObservers(self):
@@ -51,6 +51,6 @@ class DataSubject(Subject):
         '''
         
         for observer in self._observerList:
-            nanoConfig.log.logger.debug('   DataSubject - notify observers')
+            ateConfig.log.logger.debug('   DataSubject - notify observers')
             observer.update()
 

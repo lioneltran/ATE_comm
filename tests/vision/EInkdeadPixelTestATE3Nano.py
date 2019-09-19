@@ -3,8 +3,7 @@
 EInkScreenPixelTest Class
 Created: 2018 May 30
 Author: Robert Vo
-Updated: 2018 Dec 3
-Author: Thien Doan
+Updated: 2019 Sep 18 by Lionel Tran
 
 Description:
 Implementation of the EInk Screen Pixel Test class.
@@ -12,10 +11,10 @@ This class is the method in which ATE can measure detect
 dead pixel in EInk Screen.
 """
 import time
-from configuration import nanoConfig
-from configuration.nanoConfig import *
+from configuration import ateConfig
+from configuration.ateConfig import *
 from configuration.cvConfig import *
-# from configuration.bleConfig import *
+from configuration.bleConfig import *
 from tests.test import Test
 # from commands.bleCmd import BleCmd
 # import tests.scenario
@@ -170,9 +169,9 @@ class EInkDeadPixelTestATE3Nano(Test):
         all of the information of the test.
         :return: Total error pixel positions
         '''
-        nanoConfig.log.logger.info('=====================================================================')
-        nanoConfig.log.logger.info('   Test Started   - ' + self._name)
-        nanoConfig.log.logger.info('=====================================================================')
+        ateConfig.log.logger.info('=====================================================================')
+        ateConfig.log.logger.info('   Test Started   - ' + self._name)
+        ateConfig.log.logger.info('=====================================================================')
 
         cmdResponse = ''
         startTime = time.time()
@@ -215,19 +214,19 @@ class EInkDeadPixelTestATE3Nano(Test):
                     res = cmdResponse
                     if res == {}:
                         testResult.append(False)
-                        nanoConfig.log.logger.info('Cannot find dial')
+                        ateConfig.log.logger.info('Cannot find dial')
                         break
                     else:
                         xCenter = int(res['dial'][0][0])
                         yCenter = int(res['dial'][0][1])
                         watch_dial = ((xCenter, yCenter), int(res['dial'][1]))
-                        nanoConfig.log.logger.info('Watch dial position: %s' %str(watch_dial))
+                        ateConfig.log.logger.info('Watch dial position: %s' %str(watch_dial))
                 elif cmd.type == 'cv' and cmd.operation == 'findRect':
                     res = {}
                     res['Rect'] = cmdResponse
                     if res['Rect'] == {}:
                         testResult.append(False)
-                        nanoConfig.log.logger.info('Cannot detect rectangle')
+                        ateConfig.log.logger.info('Cannot detect rectangle')
                         break
                     else:
                         points = res['Rect']['points']
@@ -246,7 +245,7 @@ class EInkDeadPixelTestATE3Nano(Test):
                         #Length of rectangle: 40 pixel in pixel
                         image_ratio = round(((dist[2]+dist[3])/2)/40, 4)
                         # print(dist)
-                        nanoConfig.log.logger.debug("ratio: %s" %image_ratio)
+                        ateConfig.log.logger.debug("ratio: %s" %image_ratio)
                         result['ratio'] = image_ratio
                 elif cmd.type == 'cv' and cmd.operation == 'eraseText':
                     result['brand_area'] = cmdResponse
@@ -303,8 +302,8 @@ class EInkDeadPixelTestATE3Nano(Test):
                                     cv2.rectangle(image_b_1, (x[j] - RECT_EXTEN_THRES, y[j] - RECT_EXTEN_THRES), (x[j] + w[j] + RECT_EXTEN_THRES, y[j] + h[j] + RECT_EXTEN_THRES), (0, 0, 255), 2)
                         result['black_D_pixel'] = D_cas_pixel
                         result['black_D_mm'] = D_cas_mm
-                        nanoConfig.log.logger.info("Black image - D in pixels: %s" %str(D_cas_pixel))
-                        nanoConfig.log.logger.info("Black image - D in mm: %s" % str(D_cas_mm))
+                        ateConfig.log.logger.info("Black image - D in pixels: %s" %str(D_cas_pixel))
+                        ateConfig.log.logger.info("Black image - D in mm: %s" % str(D_cas_mm))
                         image_b_1 = cv2.resize(image_b_1, (0, 0), fx=0.5, fy=0.5)
                         image_b_2 = cv2.resize(image_b_2, (0, 0), fx=0.5, fy=0.5)
                         # cv2.imwrite(tests.scenario.Scenario.ateTestAttr['logPath'] + "deadPixel_whiteToBlack_600_" + internal_SN + "_" + str(filetimestamp) + ".jpeg", image_b_1)
@@ -360,18 +359,18 @@ class EInkDeadPixelTestATE3Nano(Test):
 
                         result['white_D_pixel'] = D_cas_pixel
                         result['white_D_mm'] = D_cas_mm
-                        nanoConfig.log.logger.info("White image - D in pixels: %s" % str(D_cas_pixel))
-                        nanoConfig.log.logger.info("White image - D in mm: %s" % str(D_cas_mm))
+                        ateConfig.log.logger.info("White image - D in pixels: %s" % str(D_cas_pixel))
+                        ateConfig.log.logger.info("White image - D in mm: %s" % str(D_cas_mm))
                     if len(defect_0204) >= 5:
                         testResult.append(False)
                     if len(defect_04) > 0:
                         testResult.append(False)
                     if dead_pixel <= cmd.limits:
                         testResult.append(True)
-                        nanoConfig.log.logger.info(self._name + ' passed.')
+                        ateConfig.log.logger.info(self._name + ' passed.')
                     else:
                         testResult.append(False)
-                        nanoConfig.log.logger.info(self._name + ' failed. Lower limit: [%s]' % (cmd.limits))
+                        ateConfig.log.logger.info(self._name + ' failed. Lower limit: [%s]' % (cmd.limits))
                     count += 1
                 # BLE command timed out.
                 elif cmd.type == 'ble' and cmdResponse['timeout']:
@@ -408,11 +407,11 @@ class EInkDeadPixelTestATE3Nano(Test):
                 os.remove(DIANA_IMAGE + 'white2.jpeg')
                 os.remove(DIANA_IMAGE + 'watchDial_Mask.jpeg')
 
-            nanoConfig.log.logger.debug("Files Removed!")
+            ateConfig.log.logger.debug("Files Removed!")
 
             self._testResult['data'] = result
-            nanoConfig.log.logger.info('   Test Result: %s' % result)
-            nanoConfig.log.logger.info('   Test Completed - ' + self._name)
+            ateConfig.log.logger.info('   Test Result: %s' % result)
+            ateConfig.log.logger.info('   Test Completed - ' + self._name)
 
             self.calcTestDuration(startTime)
 

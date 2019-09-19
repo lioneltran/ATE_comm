@@ -2,7 +2,7 @@
 import time
 import threading
 #from utilities.log import Log
-from configuration import nanoConfig
+from configuration import ateConfig
 
 
 class MyThread(threading.Thread):
@@ -32,10 +32,10 @@ class MyThread(threading.Thread):
         Run this instance's thread until completion
         :return: 
         '''
-        nanoConfig.log.logger.debug( "Starting " + self.name)
+        ateConfig.log.logger.debug( "Starting " + self.name)
         # self.logger.info(_time(self.name, self.counter, 5)
         self.thread_function()
-        nanoConfig.log.logger.debug( "Exiting " + self.name)
+        ateConfig.log.logger.debug( "Exiting " + self.name)
 
     def join(self, timeout=None):
         '''
@@ -59,5 +59,5 @@ class MyThread(threading.Thread):
             if exitFlag:
                 thread_name.exit()
             time.sleep(delay)
-            nanoConfig.log.logger.debug( "%s: %s" % (thread_name, time.ctime(time.time())))
+            ateConfig.log.logger.debug( "%s: %s" % (thread_name, time.ctime(time.time())))
             counter -= 1

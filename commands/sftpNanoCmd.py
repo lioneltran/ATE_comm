@@ -27,6 +27,10 @@ class SftpNanoCmd(Command):
 
         self._name = cmd['name']
         self._operation = cmd['operation']
+        self._cmd = cmd
+        self._type = cmd['type']
+        self._cmdResult = {}
+        self._cmdResult['name'] = cmd['name']
 
         if self._operation == 'create_connection':
             self._host = cmd['host']
@@ -38,6 +42,9 @@ class SftpNanoCmd(Command):
             self._localFilePath = cmd['localFilePath']
             self._remoteFilePath = cmd['remoteFilePath']
 
+        if self._operation == 'parse_local_json':
+            self._localFilePath = cmd['localFilePath']
+
     def execute(self):
         '''
         Send command request to the DUT for execution
@@ -45,7 +52,7 @@ class SftpNanoCmd(Command):
         '''
         # Create observers prior to serial command execution
         ateConfig.log.logger.info('Executing command - ' + self._operation)
-
+        result = ''
         try:
             if self._operation == 'create_connection':
                 SftpNanoCmd._sftfNano.create_connection(self._host, self._port, self._username, self._password)
@@ -56,8 +63,14 @@ class SftpNanoCmd(Command):
             if self._operation == 'get_file':
                 SftpNanoCmd._sftfNano.get_file(self._remoteFilePath, self._localFilePath)
 
+            if self._operation == 'parse_local_json':
+                result = SftpNanoCmd._sftfNano.parse_local_json(self._localFilePath)
+
             if self._operation == 'close_connection':
                 SftpNanoCmd._sftfNano.close_connection()
+
+            if result:
+                return result
 
         except Exception as exc:
             ateConfig.log.logger.error(sys.exc_info())

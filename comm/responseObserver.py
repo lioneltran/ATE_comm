@@ -1,5 +1,5 @@
 
-from configuration import nanoConfig
+from configuration import ateConfig
 from utilities.observer import Observer
 
 class ResponseObserver(Observer):
@@ -14,7 +14,8 @@ class ResponseObserver(Observer):
         Callback registered witht the ack/nack responseSubject
         :return: None
         '''
-        nanoConfig.log.logger.debug('   ResponseObserver- got ack')
+        if ateConfig.log._fileOutputFlag == True:
+            ateConfig.log.logger.debug('   ResponseObserver- got ack')
         self._gotAck = True
         
     @property

@@ -3,7 +3,7 @@
 LEDUniformingTestATE3 Class
 Author: Robert Vo
 Created: 2018 May 15
-Updated: 2018 Dec 3
+Updated: 2019 Sep 18 by Lionel Tran
 
 Description:
 Implementation of the LED Uniforming Test class.
@@ -11,10 +11,10 @@ This class is the method in which ATE detect
 LED uniform in FL.
 """
 import time
-from configuration import nanoConfig
-from configuration.nanoConfig import *
+from configuration import ateConfig
+from configuration.ateConfig import *
 from configuration.cvConfig import *
-# from configuration.bleConfig import *
+from configuration.bleConfig import *
 from tests.test import Test
 # import tests.scenario
 import cv2
@@ -77,9 +77,9 @@ class LEDUniformingTestATE3Nano(Test):
         all of the information of the test.
         :return: histogram correlation between image sections
         '''
-        nanoConfig.log.logger.info('=====================================================================')
-        nanoConfig.log.logger.info('   Test Started   - ' + self._name)
-        nanoConfig.log.logger.info('=====================================================================')
+        ateConfig.log.logger.info('=====================================================================')
+        ateConfig.log.logger.info('   Test Started   - ' + self._name)
+        ateConfig.log.logger.info('=====================================================================')
 
         cmdResponse = ''
         startTime = time.time()
@@ -115,9 +115,9 @@ class LEDUniformingTestATE3Nano(Test):
 
                 elif cmd.type == 'cv' and cmd.operation == 'analyzeHist':
                     if cmdResponse == {}:
-                        nanoConfig.log.logger.info('LED_' + str(i) + ' is failed')
+                        ateConfig.log.logger.info('LED_' + str(i) + ' is failed')
                         result['average_led'+str(i)] = 0
-                        nanoConfig.log.logger.info('Average of LED_' + str(i) + ' : 0')
+                        ateConfig.log.logger.info('Average of LED_' + str(i) + ' : 0')
                         average_values.append(result['average_led' + str(i)])
                         testRes.append(False)
                     else:
@@ -143,11 +143,11 @@ class LEDUniformingTestATE3Nano(Test):
                             average = average_led4
                         result['average_led'+str(i)] = round(float(average), 2)
                         average_values.append(result['average_led'+str(i)])
-                        nanoConfig.log.logger.info('Average of LED_' + str(i)+ ' : %s' %average)
+                        ateConfig.log.logger.info('Average of LED_' + str(i)+ ' : %s' %average)
                         if average > cmd.lowerLimit and average <= cmd.upperLimit:
                             testRes.append(True)
                         else:
-                            nanoConfig.log.logger.info('LED_' + str(i) + ' failed. Average of image: %s. Range: [%s, %s]' % (average, cmd.lowerLimit, cmd.upperLimit))
+                            ateConfig.log.logger.info('LED_' + str(i) + ' failed. Average of image: %s. Range: [%s, %s]' % (average, cmd.lowerLimit, cmd.upperLimit))
                             testRes.append(False)
                     # hist_value.append(res['LED_' + str(i) + '_mean_hist'])
                     i += 1
@@ -161,13 +161,13 @@ class LEDUniformingTestATE3Nano(Test):
             #Calculate average, percentage between led regions
             min_average = min(average_values)
             max_average = max(average_values)
-            nanoConfig.log.logger.info('Min of LED: %s' %min_average)
-            nanoConfig.log.logger.info('Max of LED: %s' %max_average)
+            ateConfig.log.logger.info('Min of LED: %s' %min_average)
+            ateConfig.log.logger.info('Max of LED: %s' %max_average)
 
             if max_average > 0 and min_average > 0:
                 #Comparision
                 percentage = round(min_average/max_average*100)
-                nanoConfig.log.logger.info('Ratio between min and max: %s' %percentage + '%')
+                ateConfig.log.logger.info('Ratio between min and max: %s' %percentage + '%')
                 result['average_per']= percentage
                 #If the smallest value >= 80% the biggest value --> Pass
                 if percentage >= 1:
@@ -217,18 +217,18 @@ class LEDUniformingTestATE3Nano(Test):
             os.remove(DIANA_IMAGE + '3rdCrop.jpeg')
             os.remove(DIANA_IMAGE + '4thCrop.jpeg')
 
-            nanoConfig.log.logger.debug("File Removed!")
+            ateConfig.log.logger.debug("File Removed!")
 
             if False in testRes:
                 self._testResult['passed'] = False
-                nanoConfig.log.logger.info(self._name + ' failed.')
+                ateConfig.log.logger.info(self._name + ' failed.')
             else:
                 self._testResult['passed'] = True
-                nanoConfig.log.logger.info(self._name + ' passed.')
+                ateConfig.log.logger.info(self._name + ' passed.')
 
             self._testResult['data'] = result
-            nanoConfig.log.logger.info('   Test Result: %s' % result)
-            nanoConfig.log.logger.info('   Test Completed - ' + self._name)
+            ateConfig.log.logger.info('   Test Result: %s' % result)
+            ateConfig.log.logger.info('   Test Completed - ' + self._name)
 
             self.calcTestDuration(startTime)
 

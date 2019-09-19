@@ -6,7 +6,7 @@ import traceback
 from comm.ateSerialUtil import *
 from comm.serialApp import SerialApp
 from .command import Command
-from configuration import nanoConfig
+from configuration import ateConfig
 from comm.dataObserver import DataObserver
 from comm.responseObserver import ResponseObserver
 
@@ -80,8 +80,7 @@ class SerialCmd(Command):
         # Create observers prior to serial command execution
         self._setupObservers()
 
-        nanoConfig.log.logger.info('Executing command - ' + self._messageType)
-        # print('Executing command - ' + self._messageType)
+        ateConfig.log.logger.info('Executing command - ' + self._messageType)
 
         try:
             # Send the DUT request command and then wait for the response to ensure
@@ -91,7 +90,7 @@ class SerialCmd(Command):
 
             elif self._messageType == 'Request':
 
-                if self._componentId == nanoConfig.componentID['HT_FILE_TRANSFER']:
+                if self._componentId == ateConfig.componentID['HT_FILE_TRANSFER']:
                     SerialCmd.serial.sendFileTransferRequest(self._cmd)
                 else:
                     SerialCmd.serial.sendRequest(int(ATE_REQ_MSG_ID), int(self._componentId), int(self._commandId), self._payload)
@@ -99,7 +98,7 @@ class SerialCmd(Command):
             elif self._messageType == 'Wait':
                 pass
             else:
-                nanoConfig.log.logger.error('   Invalid command - ' + self._messageType)
+                ateConfig.log.logger.error('   Invalid command - ' + self._messageType)
                 return None
 
             # Configurable timeout in ticks from the command attributes
@@ -107,7 +106,7 @@ class SerialCmd(Command):
 
             # Default - Always wait command timeout period for the returned ack response
             timer = 0
-            nanoConfig.log.logger.debug('message type: ' + self._messageType)
+            ateConfig.log.logger.debug('message type: ' + self._messageType)
             while (self._respObserver.gotAck == False) and (timer < respTimeout) and self._messageType != 'Wait':# and (self._messageType != 'Request'):
                 time.sleep(MSECS_5)
                 timer += 1
@@ -124,7 +123,7 @@ class SerialCmd(Command):
             self._cmdResult['data'] = ''
             if (self._dataObserver.gotData or self._respObserver.gotAck):
                 msg = '[' + ', '.join('0x{:02X}'.format(x) for x in SerialCmd.serial.lastResponseMessage) + ']'
-                nanoConfig.log.logger.debug('   DUT Msg Received - %s' % msg)
+                ateConfig.log.logger.debug('   DUT Msg Received - %s' % msg)
 
                 # log the DUT test results
                 self._cmdResult['passed'] = True
@@ -134,7 +133,7 @@ class SerialCmd(Command):
 
                 elif self._messageType == 'Request' or self._messageType == 'Wait':
                     if self._messageType == 'Wait':
-                        nanoConfig.log.logger.info('GOT WAIT MESSAGE')
+                        ateConfig.log.logger.info('GOT WAIT MESSAGE')
 
                     if self._feedbackData:
                         self._cmdResult['data'] = self.getResponseBody(SerialCmd.serial.lastResponseMessage)
@@ -146,11 +145,11 @@ class SerialCmd(Command):
                 # log it
                 self._cmdResult['passed'] = False
                 self._cmdResult['msg'] = 'ABORT - No Serial Status Response'
-                nanoConfig.log.logger.error('No DUT test status response')
+                ateConfig.log.logger.error('No DUT test status response')
 
         except Exception as exc:
-            nanoConfig.log.logger.error(sys.exc_info())
-            nanoConfig.log.logger.error('\n'.join(traceback.format_stack()))
+            ateConfig.log.logger.error(sys.exc_info())
+            ateConfig.log.logger.error('\n'.join(traceback.format_stack()))
             self._cmdResult['passed'] = False
 
         self._cleanupObservers()

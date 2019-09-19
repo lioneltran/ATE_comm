@@ -1,5 +1,5 @@
 
-from configuration import nanoConfig
+from configuration import ateConfig
 from utilities.observer import Observer
 
 class DataObserver(Observer):
@@ -15,7 +15,7 @@ class DataObserver(Observer):
         Callback registered with and called by the dataSubject
         :return: None
         '''
-        nanoConfig.log.logger.debug('   DataObserver - got data')
+        ateConfig.log.logger.debug('   DataObserver - got data')
         self._gotData = True
         
     @property
